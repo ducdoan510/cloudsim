@@ -5,6 +5,8 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
+import org.cloudbus.cloudsim.taskscheduling.scheduler.TaskScheduler;
+import org.cloudbus.cloudsim.taskscheduling.scheduler.TaskSchedulerFactory;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -80,20 +82,28 @@ public class MainSimulation {
         int numberOfHosts = 10;
         int numberOfVms = 10;
         int numberOfCloudlets = 60;
+        String algo = "minmin";
 
         int i = 0;
         while (i < args.length) {
-            if (args[i].equals("-h")) {
-                numberOfHosts = Integer.parseInt(args[i + 1]);
-                i += 2;
-            } else if (args[i].equals("-vm")) {
-                numberOfVms = Integer.parseInt(args[i + 1]);
-                i += 2;
-            } else if (args[i].equals("-cl")) {
-                numberOfCloudlets = Integer.parseInt((args[i + 1]));
-                i += 1;
-            } else {
-                i++;
+            switch (args[i]) {
+                case "-h" -> {
+                    numberOfHosts = Integer.parseInt(args[i + 1]);
+                    i += 2;
+                }
+                case "-vm" -> {
+                    numberOfVms = Integer.parseInt(args[i + 1]);
+                    i += 2;
+                }
+                case "-cl" -> {
+                    numberOfCloudlets = Integer.parseInt((args[i + 1]));
+                    i += 2;
+                }
+                case "-al" -> {
+                    algo = args[i + 1];
+                    i += 2;
+                }
+                default -> i++;
             }
         }
 
@@ -123,6 +133,9 @@ public class MainSimulation {
 
             broker.submitVmList(vmlist);
             broker.submitCloudletList(cloudletList);
+
+            TaskScheduler scheduler = TaskSchedulerFactory.createScheduler(algo);
+            scheduler.schedule(broker);
 
             // Fifth step: Starts the simulation
             CloudSim.startSimulation();
