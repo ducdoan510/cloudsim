@@ -21,68 +21,17 @@ public class MainSimulation {
     /** The vmlist. */
     private static List<Vm> vmlist;
 
-    private static List<Vm> createVM(int userId, int vms) {
-
-        //Creates a container to store VMs. This list is passed to the broker later
-        LinkedList<Vm> list = new LinkedList<>();
-
-        //VM Parameters
-        long size = 10000; //image size (MB)
-        int ram = 512; //vm memory (MB)
-        int mips = 1000;
-        long bw = 1000;
-        int pesNumber = 1; //number of cpus
-        String vmm = "Xen"; //VMM name
-
-        //create VMs
-        Vm[] vm = new Vm[vms];
-
-        for(int i = 0; i < vms; i++){
-            vm[i] = new Vm(i, userId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
-            //for creating a VM with a space shared scheduling policy for cloudlets:
-            //vm[i] = Vm(i, userId, mips, pesNumber, ram, bw, size, priority, vmm, new CloudletSchedulerSpaceShared());
-
-            list.add(vm[i]);
-        }
-
-        return list;
-    }
-
-
-    private static List<Cloudlet> createCloudlet(int userId, int cloudlets){
-        // Creates a container to store Cloudlets
-        LinkedList<Cloudlet> list = new LinkedList<>();
-
-        //cloudlet parameters
-        long length = 1000;
-        long fileSize = 300;
-        long outputSize = 300;
-        int pesNumber = 1;
-        UtilizationModel utilizationModel = new UtilizationModelFull();
-
-        Cloudlet[] cloudlet = new Cloudlet[cloudlets];
-
-        for(int i = 0; i < cloudlets; i++){
-            cloudlet[i] = new Cloudlet(i, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
-            // setting the owner of these Cloudlets
-            cloudlet[i].setUserId(userId);
-            list.add(cloudlet[i]);
-        }
-
-        return list;
-    }
-
-
     ////////////////////////// STATIC METHODS ///////////////////////
 
     /**
      * Creates main() to run this example
      */
     public static void main(String[] args) {
-        int numberOfHosts = 10;
-        int numberOfVms = 10;
+        int numberOfHosts = 12;
+        int numberOfVms = 12;
         int numberOfCloudlets = 60;
-        String algo = "minmin";
+        double longTaskPerc = 0.5;
+        String algo = "mm";
 
         int i = 0;
         while (i < args.length) {
@@ -96,11 +45,15 @@ public class MainSimulation {
                     i += 2;
                 }
                 case "-cl" -> {
-                    numberOfCloudlets = Integer.parseInt((args[i + 1]));
+                    numberOfCloudlets = Integer.parseInt(args[i + 1]);
                     i += 2;
                 }
                 case "-al" -> {
                     algo = args[i + 1];
+                    i += 2;
+                }
+                case "ltp" -> {
+                    longTaskPerc = Double.parseDouble(args[i + 1]);
                     i += 2;
                 }
                 default -> i++;
@@ -129,7 +82,7 @@ public class MainSimulation {
 
             //Fourth step: Create VMs and Cloudlets and send them to broker
             vmlist = createVM(brokerId, numberOfVms);
-            cloudletList = createCloudlet(brokerId, numberOfCloudlets);
+            cloudletList = createCloudlet(brokerId, numberOfCloudlets, longTaskPerc);
 
             broker.submitVmList(vmlist);
             broker.submitCloudletList(cloudletList);
@@ -154,6 +107,58 @@ public class MainSimulation {
             e.printStackTrace();
             Log.printLine("The simulation has been terminated due to an unexpected error");
         }
+    }
+
+    private static List<Vm> createVM(int userId, int vms) {
+
+        //Creates a container to store VMs. This list is passed to the broker later
+        LinkedList<Vm> list = new LinkedList<>();
+
+        //VM Parameters
+        long size = 10000; //image size (MB)
+        int ram = 512; //vm memory (MB)
+        long bw = 1000;
+        int pesNumber = 1; //number of cpus
+        String vmm = "Xen"; //VMM name
+
+        //create VMs
+        Vm[] vm = new Vm[vms];
+
+        for(int i = 0; i < vms; i++){
+            int mips = i * 4 <= vms ? 1000 : 500; // about 1/4 of the vms have more capacity
+            vm[i] = new Vm(i, userId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
+            //for creating a VM with a space shared scheduling policy for cloudlets:
+            //vm[i] = Vm(i, userId, mips, pesNumber, ram, bw, size, priority, vmm, new CloudletSchedulerSpaceShared());
+
+            list.add(vm[i]);
+        }
+
+        return list;
+    }
+
+
+    private static List<Cloudlet> createCloudlet(int userId, int cloudlets, double longTaskPerc){
+        // Creates a container to store Cloudlets
+        LinkedList<Cloudlet> list = new LinkedList<>();
+
+        //cloudlet parameters
+        long fileSize = 300;
+        long outputSize = 300;
+        int pesNumber = 1;
+        UtilizationModel utilizationModel = new UtilizationModelFull();
+
+        Cloudlet[] cloudlet = new Cloudlet[cloudlets];
+
+        for(int i = 0; i < cloudlets; i++){
+            long length = i <= cloudlets * longTaskPerc ? 5000 : 1000;
+
+            cloudlet[i] = new Cloudlet(i, length, pesNumber, fileSize, outputSize, utilizationModel, utilizationModel, utilizationModel);
+            // setting the owner of these Cloudlets
+            cloudlet[i].setUserId(userId);
+            list.add(cloudlet[i]);
+        }
+
+        return list;
     }
 
     private static Datacenter createDatacenter(String name, int numberOfHosts){

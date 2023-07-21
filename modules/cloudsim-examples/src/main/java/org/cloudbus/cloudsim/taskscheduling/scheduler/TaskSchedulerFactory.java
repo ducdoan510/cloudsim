@@ -3,8 +3,10 @@ package org.cloudbus.cloudsim.taskscheduling.scheduler;
 public class TaskSchedulerFactory {
     public static TaskScheduler createScheduler(String schedulerType, Object... args) {
         switch (schedulerType) {
-            case "minmin":
+            case "mm":
                 return new MinMinScheduler();
+            case "lbimm":
+                return new LoadBalanceImprovedMinMinScheduler();
             default:
                 throw new IllegalArgumentException("Unknown scheduler type");
         }

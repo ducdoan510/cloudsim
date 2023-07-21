@@ -6,25 +6,14 @@ import org.cloudbus.cloudsim.Vm;
 
 import java.util.List;
 
-public class MinMinScheduler implements TaskScheduler {
-    @Override
-    public void schedule(DatacenterBroker broker) {
-        List<Cloudlet> cloudletList = broker.getCloudletList();
-        List<Vm> vmList = broker.getVmList();
+public class MinMinScheduler extends TaskScheduler {
 
+    @Override
+    public int[] getAssignments(List<Cloudlet> cloudletList, List<Vm> vmList) {
         int numberOfCloudlets = cloudletList.size();
         int numberOfVms = vmList.size();
 
-        double[][] executionTimes = new double[numberOfCloudlets][numberOfVms];
-
-        for (int i = 0; i < numberOfCloudlets; i++) {
-            Cloudlet cloudlet = cloudletList.get(i);
-            for (int j = 0; j < numberOfVms; j++) {
-                Vm vm = vmList.get(j);
-                executionTimes[i][j] = cloudlet.getCloudletTotalLength() / vm.getMips();
-            }
-        }
-
+        double[][] executionTimes = getExecutionTimes(cloudletList, vmList);
         boolean[] isCloudletScheduled = new boolean[numberOfCloudlets];
         int[] scheduledVms = new int[numberOfCloudlets];
 
@@ -49,10 +38,6 @@ public class MinMinScheduler implements TaskScheduler {
             scheduledVms[minCloudletIdx] = minVmIdx;
         }
 
-        for (int i = 0; i < numberOfCloudlets; i++) {
-            Cloudlet cloudlet = cloudletList.get(i);
-            Vm vm = vmList.get(scheduledVms[i]);
-            broker.bindCloudletToVm(cloudlet.getCloudletId(), vm.getId());
-        }
+        return scheduledVms;
     }
 }
