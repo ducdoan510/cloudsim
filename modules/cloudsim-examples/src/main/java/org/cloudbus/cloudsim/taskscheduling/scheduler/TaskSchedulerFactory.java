@@ -11,6 +11,8 @@ public class TaskSchedulerFactory {
                 return new ReschedulingEnhancedMinMinScheduler();
             case "sjf":
                 return new ShortestJobFirstScheduler();
+            case "mxm":
+                return new MaxMinScheduler();
             default:
                 throw new IllegalArgumentException("Unknown scheduler type");
         }
