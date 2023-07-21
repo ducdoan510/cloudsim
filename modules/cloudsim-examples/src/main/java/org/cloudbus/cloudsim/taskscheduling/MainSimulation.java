@@ -31,7 +31,7 @@ public class MainSimulation {
         int numberOfVms = 12;
         int numberOfCloudlets = 60;
         double longTaskPerc = 0.5;
-        String algo = "mm";
+        String algo = "lbimm";
 
         int i = 0;
         while (i < args.length) {
