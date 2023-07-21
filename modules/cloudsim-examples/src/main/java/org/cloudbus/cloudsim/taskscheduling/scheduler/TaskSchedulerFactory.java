@@ -9,6 +9,8 @@ public class TaskSchedulerFactory {
                 return new LoadBalanceImprovedMinMinScheduler();
             case "remm":
                 return new ReschedulingEnhancedMinMinScheduler();
+            case "sjf":
+                return new ShortestJobFirstScheduler();
             default:
                 throw new IllegalArgumentException("Unknown scheduler type");
         }

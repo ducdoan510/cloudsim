@@ -29,7 +29,7 @@ public class MainSimulation {
     public static void main(String[] args) {
         int numberOfHosts = 12;
         int numberOfVms = 12;
-        int numberOfCloudlets = 60;
+        int numberOfCloudlets = 1000;
         double longTaskPerc = 0.5;
         String algo = "lbimm";
 
@@ -124,8 +124,8 @@ public class MainSimulation {
         //create VMs
         Vm[] vm = new Vm[vms];
 
-        for(int i = 0; i < vms; i++){
-            int mips = i * 4 <= vms ? 1000 : 500; // about 1/4 of the vms have more capacity
+        for(int i = 0; i < vms; i++) {
+            int mips = i * 10 <= vms ? 1000 : 500; // about 1/4 of the vms have more capacity
             vm[i] = new Vm(i, userId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
             //for creating a VM with a space shared scheduling policy for cloudlets:
             //vm[i] = Vm(i, userId, mips, pesNumber, ram, bw, size, priority, vmm, new CloudletSchedulerSpaceShared());
