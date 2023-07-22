@@ -56,6 +56,7 @@ public class LoadBalanceImprovedMinMinScheduler extends MinMinScheduler {
 //            System.out.println(Arrays.toStrinmmg(scheduledVms));
             iter++;
         }
+        System.out.println("Number of rescheduling rounds: " + iter);
 
         return scheduledVms;
     }

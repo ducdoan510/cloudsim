@@ -125,7 +125,7 @@ public class MainSimulation {
         Vm[] vm = new Vm[vms];
 
         for(int i = 0; i < vms; i++) {
-            int mips = i * 10 <= vms ? 1000 : 500; // about 1/4 of the vms have more capacity
+            int mips = Math.min((i / 2 + 1) * 200, 1000);
             vm[i] = new Vm(i, userId, mips, pesNumber, ram, bw, size, vmm, new CloudletSchedulerSpaceShared());
             //for creating a VM with a space shared scheduling policy for cloudlets:
             //vm[i] = Vm(i, userId, mips, pesNumber, ram, bw, size, priority, vmm, new CloudletSchedulerSpaceShared());
@@ -137,7 +137,7 @@ public class MainSimulation {
     }
 
 
-    private static List<Cloudlet> createCloudlet(int userId, int cloudlets, double longTaskPerc){
+    private static List<Cloudlet> createCloudlet(int userId, int cloudlets, double longTaskPerc) {
         // Creates a container to store Cloudlets
         LinkedList<Cloudlet> list = new LinkedList<>();
 

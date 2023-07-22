@@ -13,6 +13,8 @@ public class TaskSchedulerFactory {
                 return new ShortestJobFirstScheduler();
             case "mxm":
                 return new MaxMinScheduler();
+            case "heft":
+                return new HEFTScheduler();
             default:
                 throw new IllegalArgumentException("Unknown scheduler type");
         }
