@@ -10,6 +10,8 @@ public class TaskSchedulerFactory {
             case "mxm" -> new MaxMinScheduler();
             case "heft" -> new HEFTScheduler();
             case "mheft" -> new ModifiedHEFT();
+            case "ctsa" -> new CompletionTimeBasedSufferageScheduler();
+            case "etsa" -> new ExecutionTimeBasedSufferageScheduler();
             default -> throw new IllegalArgumentException("Unknown scheduler type");
         };
     }
