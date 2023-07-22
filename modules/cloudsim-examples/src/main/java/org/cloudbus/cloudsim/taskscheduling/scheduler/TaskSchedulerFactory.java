@@ -2,21 +2,15 @@ package org.cloudbus.cloudsim.taskscheduling.scheduler;
 
 public class TaskSchedulerFactory {
     public static TaskScheduler createScheduler(String schedulerType, Object... args) {
-        switch (schedulerType) {
-            case "mm":
-                return new MinMinScheduler();
-            case "lbimm":
-                return new LoadBalanceImprovedMinMinScheduler();
-            case "remm":
-                return new ReschedulingEnhancedMinMinScheduler();
-            case "sjf":
-                return new ShortestJobFirstScheduler();
-            case "mxm":
-                return new MaxMinScheduler();
-            case "heft":
-                return new HEFTScheduler();
-            default:
-                throw new IllegalArgumentException("Unknown scheduler type");
-        }
+        return switch (schedulerType) {
+            case "mm" -> new MinMinScheduler();
+            case "lbimm" -> new LoadBalanceImprovedMinMinScheduler();
+            case "remm" -> new ReschedulingEnhancedMinMinScheduler();
+            case "sjf" -> new ShortestJobFirstScheduler();
+            case "mxm" -> new MaxMinScheduler();
+            case "heft" -> new HEFTScheduler();
+            case "mheft" -> new ModifiedHEFT();
+            default -> throw new IllegalArgumentException("Unknown scheduler type");
+        };
     }
 }
