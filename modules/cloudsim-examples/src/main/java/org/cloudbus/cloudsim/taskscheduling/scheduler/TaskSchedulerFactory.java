@@ -13,6 +13,9 @@ public class TaskSchedulerFactory {
             case "ctsa" -> new CompletionTimeBasedSufferageScheduler();
             case "etsa" -> new ExecutionTimeBasedSufferageScheduler();
             case "aco" -> new AntColonyOptimizationScheduler();
+            case "ga" -> new GeneticAlgorithmScheduler();
+            case "aga" -> new AdaptiveGeneticAlgorithmScheduler();
+            case "iaga" -> new ImprovedAdaptiveGeneticAlgorithmScheduler();
             default -> throw new IllegalArgumentException("Unknown scheduler type");
         };
     }
