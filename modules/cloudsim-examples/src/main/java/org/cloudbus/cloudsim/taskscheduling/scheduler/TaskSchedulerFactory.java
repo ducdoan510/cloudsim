@@ -12,6 +12,7 @@ public class TaskSchedulerFactory {
             case "mheft" -> new ModifiedHEFT();
             case "ctsa" -> new CompletionTimeBasedSufferageScheduler();
             case "etsa" -> new ExecutionTimeBasedSufferageScheduler();
+            case "aco" -> new AntColonyOptimizationScheduler();
             default -> throw new IllegalArgumentException("Unknown scheduler type");
         };
     }
