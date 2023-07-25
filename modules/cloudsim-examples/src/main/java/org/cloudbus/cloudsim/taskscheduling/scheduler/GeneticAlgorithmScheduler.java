@@ -12,8 +12,8 @@ public class GeneticAlgorithmScheduler extends TaskScheduler {
     protected int pop_size = 100;
     private double mutationProb = 0.1;
     private double crossoverProb = 0.7;
-
     protected int maxIter = 100;
+    Random rand = new Random(131996L);
 
     private double fitnessFunction(List<Integer> schedule, double[][] executionTime) {
         int ncloudlets = executionTime.length;
@@ -44,7 +44,6 @@ public class GeneticAlgorithmScheduler extends TaskScheduler {
 
     private List<Integer> generateRandomSchedule(int ncloudlets, int nvms) {
         List<Integer> schedule = new ArrayList<>();
-        Random rand = new Random();
         for (int clIdx = 0; clIdx < ncloudlets; clIdx++) {
             schedule.add(rand.nextInt(nvms));
         }
@@ -67,7 +66,6 @@ public class GeneticAlgorithmScheduler extends TaskScheduler {
     private void crossover(List<Integer> parent1, List<Integer> parent2, int parentIdx1, int parentIdx2, double[] fitness, int iter) {
         // perform 1-point crossover
         double prob = getCrossoverProb(parentIdx1, parentIdx2, fitness, iter);
-        Random rand = new Random();
         if (rand.nextDouble() < prob) {
             int mutationPoint = rand.nextInt(parent1.size());
             for (int i = mutationPoint; i < parent1.size(); i++) {
@@ -85,7 +83,6 @@ public class GeneticAlgorithmScheduler extends TaskScheduler {
     private void mutate(int nvms, List<Integer> schedule, int idx, double[] fitness, int iter) {
         // randomly mutation the schedule
         double prob = getMutationProb(idx, fitness, iter);
-        Random rand = new Random();
         for (int i = 0; i < schedule.size(); i++) {
             if (rand.nextDouble() < prob) {
                 schedule.set(i, rand.nextInt(nvms));
@@ -110,7 +107,6 @@ public class GeneticAlgorithmScheduler extends TaskScheduler {
         double[][] executionTime = getExecutionTimes(cloudletList, vmList);
 
         List<List<Integer>> population = initPopulation(ncloudlets, nvms);
-        Random rand = new Random();
         double[] fitness = calcFitness(population, executionTime);
 
         for (int iter = 0; iter < maxIter; iter++) {
