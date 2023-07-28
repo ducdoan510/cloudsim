@@ -9,10 +9,7 @@ import org.cloudbus.cloudsim.taskscheduling.scheduler.TaskScheduler;
 import org.cloudbus.cloudsim.taskscheduling.scheduler.TaskSchedulerFactory;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class MainSimulation {
     /** The cloudlet list. */
@@ -30,7 +27,7 @@ public class MainSimulation {
         int numberOfHosts = 12;
         int numberOfVms = 12;
         int numberOfCloudlets = 1000;
-        double longTaskPerc = 0.5;
+        double longTaskPerc = 0.2;
         String algo = "lbimm";
 
         int i = 0;
@@ -243,28 +240,38 @@ public class MainSimulation {
      * @param list  list of Cloudlets
      */
     private static void printCloudletList(List<Cloudlet> list) {
-        int size = list.size();
-        Cloudlet cloudlet;
-
-        String indent = "    ";
-        Log.printLine();
-        Log.printLine("========== OUTPUT ==========");
-        Log.printLine("Cloudlet ID" + indent + "STATUS" + indent +
-                "Data center ID" + indent + "VM ID" + indent + indent + "Time" + indent + "Start Time" + indent + "Finish Time");
-
-        DecimalFormat dft = new DecimalFormat("###.##");
-        for (Cloudlet value : list) {
-            cloudlet = value;
-            Log.print(indent + cloudlet.getCloudletId() + indent + indent);
-
-            if (cloudlet.getStatus() == Cloudlet.SUCCESS) {
-                Log.print("SUCCESS");
-
-                Log.printLine(indent + indent + cloudlet.getResourceId() + indent + indent + indent + cloudlet.getVmId() +
-                        indent + indent + indent + dft.format(cloudlet.getActualCPUTime()) +
-                        indent + indent + dft.format(cloudlet.getExecStartTime()) + indent + indent + indent + dft.format(cloudlet.getFinishTime()));
-            }
+//        int size = list.size();
+//        Cloudlet cloudlet;
+//
+//        String indent = "    ";
+//        Log.printLine();
+//        Log.printLine("========== OUTPUT ==========");
+//        Log.printLine("Cloudlet ID" + indent + "STATUS" + indent +
+//                "Data center ID" + indent + "VM ID" + indent + indent + "Time" + indent + "Start Time" + indent + "Finish Time");
+//
+//        DecimalFormat dft = new DecimalFormat("###.##");
+//        for (Cloudlet value : list) {
+//            cloudlet = value;
+//            Log.print(indent + cloudlet.getCloudletId() + indent + indent);
+//
+//            if (cloudlet.getStatus() == Cloudlet.SUCCESS) {
+//                Log.print("SUCCESS");
+//
+//                Log.printLine(indent + indent + cloudlet.getResourceId() + indent + indent + indent + cloudlet.getVmId() +
+//                        indent + indent + indent + dft.format(cloudlet.getActualCPUTime()) +
+//                        indent + indent + dft.format(cloudlet.getExecStartTime()) + indent + indent + indent + dft.format(cloudlet.getFinishTime()));
+//            }
+//        }
+        List<Double> finishTime = new ArrayList<>();
+        double totalFinishTine = 0;
+        for (Cloudlet cloudlet : list) {
+            finishTime.add(cloudlet.getFinishTime());
+            totalFinishTine += cloudlet.getFinishTime();
         }
-
+        Collections.sort(finishTime);
+        DecimalFormat dft = new DecimalFormat("###.##");
+        Log.printLine("Average Schedule Time: " + dft.format(totalFinishTine / list.size()));
+        Log.printLine("p99 Schedule Time: " + dft.format(finishTime.get((int)(list.size() * 0.99))));
+        Log.printLine("Makespan: " + dft.format(finishTime.get(finishTime.size() - 1)));
     }
 }
