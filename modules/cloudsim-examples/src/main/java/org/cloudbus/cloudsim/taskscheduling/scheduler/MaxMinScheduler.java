@@ -3,7 +3,10 @@ package org.cloudbus.cloudsim.taskscheduling.scheduler;
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.Vm;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MaxMinScheduler extends TaskScheduler {
     @Override
@@ -12,33 +15,33 @@ public class MaxMinScheduler extends TaskScheduler {
         int numberOfVms = vmList.size();
 
         double[][] executionTimes = getExecutionTimes(cloudletList, vmList);
-        boolean[] isCloudletScheduled = new boolean[numberOfCloudlets];
+        int[] scheduledVms = new int[cloudletList.size()];
+        double[] completionTime = new double[vmList.size()];
 
-        double[] completionTime = new double[numberOfVms];
+        List<Map.Entry<Integer, Long>> sortedCloudList = new ArrayList<>();
+        for (int i = 0; i < cloudletList.size(); i++) {
+            sortedCloudList.add(new AbstractMap.SimpleEntry<>(i, cloudletList.get(i).getCloudletTotalLength()));
+        }
+        sortedCloudList.sort((cl1, cl2) -> {
+            if (cl1.getValue() > cl2.getValue()) return -1;
+            if (cl1.getValue() < cl2.getValue()) return 1;
+            return Integer.compare(cl1.getKey(), cl2.getKey());
+        });
 
-        int[] scheduledVms = new int[numberOfCloudlets];
-
-        for (int i = 0; i < numberOfCloudlets; i++) {
-            int maxCloudletIdx = -1;
-            int maxVmIdx = -1;
-            double maxCompletionTime = Double.MIN_VALUE;
-
-            for (int clIdx = 0; clIdx < numberOfCloudlets; clIdx++) {
-                if (!isCloudletScheduled[clIdx]) {
-                    for (int vmIdx = 0; vmIdx < numberOfVms; vmIdx++) {
-                        if (executionTimes[clIdx][vmIdx] + completionTime[vmIdx] > maxCompletionTime) {
-                            maxCompletionTime = executionTimes[clIdx][vmIdx] + completionTime[vmIdx];
-                            maxCloudletIdx = clIdx;
-                            maxVmIdx = vmIdx;
-                        }
-                    }
+        for (int i = 0; i < cloudletList.size(); i++) {
+            int clIdx = sortedCloudList.get(i).getKey();
+            double minCompletionTime = Double.MAX_VALUE;
+            int minVmIdx = -1;
+            for (int vmIdx = 0; vmIdx < vmList.size(); vmIdx++) {
+                if (completionTime[vmIdx] + executionTimes[clIdx][vmIdx] < minCompletionTime) {
+                    minCompletionTime = completionTime[vmIdx] + executionTimes[clIdx][vmIdx];
+                    minVmIdx = vmIdx;
                 }
             }
-
-            isCloudletScheduled[maxCloudletIdx] = true;
-            scheduledVms[maxCloudletIdx] = maxVmIdx;
-            completionTime[maxVmIdx] = maxCompletionTime;
+            completionTime[minVmIdx] += executionTimes[clIdx][minVmIdx];
+            scheduledVms[clIdx] = minVmIdx;
         }
+
         return scheduledVms;
     }
 }
